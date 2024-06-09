@@ -43,7 +43,7 @@ public class SupplierTest {
     static void testAddItemToSupplier() {
         Supplier supplier = new Supplier("Supplier Name", "1234 Address St");
         Item item = new Item("Widget", 25.75f, 101);
-        supplier.addItem(item, 100);
+        supplier.addItem(item);
         System.out.println(supplier.getItems().contains(item) ? TEST_PASSED : TEST_FAILED);
     }
 
@@ -72,7 +72,7 @@ public class SupplierTest {
     static void testUpdateItemDetails() {
         Supplier supplier = new Supplier("Supplier Name", "1234 Address St");
         Item item = new Item("Widget", 25.75f, 101);
-        supplier.addItem(item, 100);
+        supplier.addItem(item);
         item.setPrice(30.00f);  // Change price
         supplier.updateItem(item, 30.00f);
         System.out.println(item.getPrice() == 30.00f ? TEST_PASSED : TEST_FAILED);
@@ -85,7 +85,7 @@ public class SupplierTest {
     static void testRemoveItemFromSupplier() {
         Supplier supplier = new Supplier("Supplier Name", "1234 Address St");
         Item item = new Item("Widget", 25.75f, 101);
-        supplier.addItem(item, 100);
+        supplier.addItem(item);
         supplier.removeItem(item);
         System.out.println(!supplier.getItems().contains(item) ? TEST_PASSED : TEST_FAILED);
     }
