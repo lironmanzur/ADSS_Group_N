@@ -1,10 +1,11 @@
 package dev.Frontend;
 
-import dev.Backend.Item;
-import dev.Backend.Order;
-import dev.Backend.Supplier;
+import dev.BusinessLayer.SupplierBL.Item;
+import dev.BusinessLayer.SupplierBL.Order;
+import dev.BusinessLayer.SupplierBL.Supplier;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class SupplierManagementSystem {
     private ArrayList<Supplier> suppliers;
@@ -15,7 +16,7 @@ public class SupplierManagementSystem {
         suppliers.add(supplier);
     }
 
-    public void placeOrder(Supplier supplier, ArrayList<Item> items) {
+    public void placeOrder(Supplier supplier, Map<Item, Integer> items) {
         // Logic to place an order
         Order order = new Order(supplier, items);
         if (orders == null) orders = new ArrayList<Order>();

@@ -1,5 +1,8 @@
 package dev.Tests;
-import dev.Backend.*;
+import dev.BusinessLayer.SupplierBL.Contact;
+import dev.BusinessLayer.SupplierBL.DiscountNote;
+import dev.BusinessLayer.SupplierBL.Item;
+import dev.BusinessLayer.SupplierBL.Supplier;
 import dev.Frontend.*;
 
 import java.util.ArrayList;

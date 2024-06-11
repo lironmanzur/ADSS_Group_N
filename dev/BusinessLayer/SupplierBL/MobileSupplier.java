@@ -1,5 +1,5 @@
 
-package dev.Backend;
+package dev.BusinessLayer.SupplierBL;
 
 public class MobileSupplier extends Supplier {
 

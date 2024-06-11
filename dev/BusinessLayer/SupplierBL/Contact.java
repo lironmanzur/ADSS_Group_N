@@ -1,4 +1,4 @@
-package dev.Backend;
+package dev.BusinessLayer.SupplierBL;
 public class Contact {
     private String name;
     private String phoneNumber;
@@ -16,12 +16,12 @@ public class Contact {
         Address = address;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public String getPhoneNumber() {
         return phoneNumber;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getAddress() {

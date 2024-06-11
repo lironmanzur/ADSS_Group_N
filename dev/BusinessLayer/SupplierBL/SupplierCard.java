@@ -1,4 +1,4 @@
-package dev.Backend;
+package dev.BusinessLayer.SupplierBL;
 
 public abstract class SupplierCard {
     String name;

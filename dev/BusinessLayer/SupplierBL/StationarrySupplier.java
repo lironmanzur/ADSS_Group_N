@@ -1,4 +1,4 @@
-package dev.Backend;
+package dev.BusinessLayer.SupplierBL;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
