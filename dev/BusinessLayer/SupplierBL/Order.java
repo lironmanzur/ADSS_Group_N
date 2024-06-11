@@ -2,6 +2,7 @@ package dev.BusinessLayer.SupplierBL;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -16,6 +17,12 @@ public class Order {
 
     public Order(Supplier supplier, Map<Item, Integer> items) {
         this.items = items;
+        this.delivered = false;
+        this.supplier= supplier;
+
+    }
+    public Order(Supplier supplier) {
+        this.items = new HashMap<>();
         this.delivered = false;
         this.supplier= supplier;
 
@@ -94,7 +101,7 @@ public class Order {
                 sum+=item.getPrice()*items.get(item);
             }
             else {
-                sum+=calculateItemDiscount(item, discountNote.getDisscounts().get(item), items.get(item));
+                sum+=calculateItemDiscount(item, discountNote.getDisscounts().get(item), items.get(item))*items.get(item);
             }
         }
         return sum;
@@ -107,7 +114,12 @@ public class Order {
                 price=map.get(i);
             }
         }
-        return price*count;
+        return price;
 
+    }
+
+    public void addItem(Item item, int i) {
+        if (items == null) items = new HashMap<>();
+        items.put(item, (Integer) i);
     }
 }

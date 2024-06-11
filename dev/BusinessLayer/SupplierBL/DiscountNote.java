@@ -10,6 +10,10 @@ public class DiscountNote {
         this.disscounts = disscounts;
     }
 
+    public DiscountNote() {
+
+    }
+
     public void setDisscounts(Map<Item, Map<Integer, Float>> disscounts) {
         this.disscounts = disscounts;
     }

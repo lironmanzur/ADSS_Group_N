@@ -28,7 +28,7 @@ public class Main {
         // Simulate placing an order for items from Supplier1
         ArrayList<Item> orderItems = new ArrayList<>();
         orderItems.add(item1);
-        managementSystem.placeOrder(supplier1, orderItems);
+        //managementSystem.placeOrder(supplier1, orderItems);
 
         // Output the current status of suppliers
         for (Supplier supplier : managementSystem.getSuppliers()) {

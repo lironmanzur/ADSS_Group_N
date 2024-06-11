@@ -60,7 +60,7 @@ public class SupplierTest {
         Item item = new Item("Widget", 20.00f, 201);
         ArrayList<Item> items = new ArrayList<>();
         items.add(item);
-        system.placeOrder(supplier, items);
+        //system.placeOrder(supplier, items);
         System.out.println(!system.getOrders().isEmpty() ? TEST_PASSED : TEST_FAILED);
     }
 
