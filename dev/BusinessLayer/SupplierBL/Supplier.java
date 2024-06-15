@@ -5,6 +5,20 @@ import java.util.ArrayList;
 public class Supplier {
     private String name;
     private String address;
+
+    public SupplierCard getCard() {
+        return card;
+    }
+
+    public void setDiscountNote(DiscountNote discountNote) {
+        this.discountNote = discountNote;
+    }
+
+    public DiscountNote getDiscountNote() {
+        return discountNote;
+    }
+
+    private DiscountNote discountNote;
     private SupplierCard card;
     private ArrayList<Contact> contacts;  // List of contact persons
     private ArrayList<Item> items;
@@ -12,8 +26,8 @@ public class Supplier {
     public Supplier(String name, String address) {
         this.name = name;
         this.address = address;
-        contacts = new ArrayList<Contact>();
-        items = new ArrayList<Item>();
+        this.contacts = new ArrayList<Contact>();
+        this.items = new ArrayList<Item>();
     }
 
     public String getName() {
@@ -43,15 +57,25 @@ public class Supplier {
     public void addContact(Contact contact) {
         contacts.add(contact);
     }
-    public ArrayList<Contact> getContacts(){
+
+    public ArrayList<Contact> getContacts() {
         return contacts;
     }
 
-    public void updateItem(Item item, float v) {
-        item.setPrice(v);
+    public void updateItem(Item item, float newPrice) {
+        item.setPrice(newPrice);
     }
 
     public void removeItem(Item item) {
         items.remove(item);
+    }
+
+    public Item getItemByName(String itemName) {
+        for (Item item : items) {
+            if (item.getName().equals(itemName)) {
+                return item;
+            }
+        }
+        return null;  // Return null if no item matches the given name
     }
 }
