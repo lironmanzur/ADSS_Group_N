@@ -13,23 +13,57 @@ public class EmployeeController {
 
     private Map<Integer, Employee> employeesById;
     private Map<Integer, Constraint> constraintsByEId;
+    private Map<String,List<Integer>> employeesByBranch;
     private GetShiftCB SCB;
+    private boolean isConstraintRegistrationOpen;
+
+
 
     public EmployeeController() {
         employeesById = new HashMap<Integer, Employee>();
+        constraintsByEId = new HashMap<Integer,Constraint>();
+        isConstraintRegistrationOpen = true;
+        employeesByBranch = new HashMap<>();
+
+
+
+
 
     }
 
 //HR Manager Methods
 
-    public void addEmployee(int id, String name, int salary, int bankNumber, Date D, String phoneNumber, String branch) throws Exception {
+
+    public boolean addBranch(int bId, String bName, String bAddress){
+        if(employeesByBranch.containsKey(bName)){
+            throw new RuntimeException("Branch already exists");
+        }
+        employeesByBranch.put(bName, new ArrayList<>());
+        return true;
+    }
+
+
+
+    public Map<Integer, Employee> getEmployeesById() {
+        return employeesById;
+    }
+
+    public boolean addEmployee(int id,String name, int salary, int bankNumber, Date D, String phoneNumber, String branch) throws Exception {
         if (employeesById.containsKey(id)) {
             throw new Exception("Employee with ID:" + id + " already exists!");
         } else {
             Employee employee = new Employee(id, name, salary, bankNumber, D, phoneNumber, branch);
             employeesById.put(id, employee);
             constraintsByEId.put(id, employee.getConstraint());
+            employeesByBranch.get(employee.getBranch()).add(id);
+
+
+
+            return true;
         }
+    }
+    public int getCapacityOfEmployee() {
+        return employeesById.size();
     }
 
     public Employee getEmployee(int id) throws Exception {
@@ -114,9 +148,15 @@ public class EmployeeController {
         employee.setSalary(newSalary);
     }
 
-    public void updateEmployeeBankNumber(int id, int newBankNumber) throws Exception {
+    public boolean updateEmployeeBankNumber(int id, int newBankNumber) throws Exception {
         Employee employee = getEmployee(id);
         employee.setBankNumber(newBankNumber);
+        return true;
+    }
+    public boolean updateEmployeePhoneNumber(int id, String newPhoneNumber) throws Exception {
+        Employee employee = getEmployee(id);
+        employee.setPhoneNumber(newPhoneNumber);
+        return true;
     }
 
     public void updateEmployeeBranch(int id, String newBranch) throws Exception {
@@ -128,9 +168,10 @@ public class EmployeeController {
         Employee employee = getEmployee(id);
         employee.setLicense(driverLicense);
     }
-    public void updateEmployeeName(int id, String newName) throws Exception {
+    public boolean updateEmployeeName(int id, String newName) throws Exception {
         Employee employee = getEmployee(id);
         employee.setName(newName);
+        return true;
     }
 
 
@@ -138,22 +179,24 @@ public class EmployeeController {
 
 
     public boolean addConstraint(int id, int day, String shift) throws Exception {
+        if(! isConstraintRegistrationOpen){throw new Exception("Constraint registration is closed!");}
         if (!employeesById.containsKey(id)) {throw new Exception("Employee with ID:" + id + " not exists!");}
         Constraint c = constraintsByEId.get(id);
         if (c.isAvailable(day, shift)) {
             c.setAvailability(day, shift, false);
             return true;
         }
-        return false;
+        else throw new Exception("This constraint is already exist!");
     }
     public boolean removeConstraint(int id, int day, String shift) throws Exception {
+        if(! isConstraintRegistrationOpen){throw new Exception("Constraint registration is closed!");}
         if (!employeesById.containsKey(id)) {throw new Exception("Employee with ID:" + id + " not exists!");}
         Constraint c = constraintsByEId.get(id);
         if (! c.isAvailable(day, shift)) {
             c.setAvailability(day, shift, true);
             return true;
         }
-        return false;
+        else throw new Exception("This constraint is not exist!");
     }
     // system + HR Manager + Employee
     public boolean removeAllEmployeeConstraints(int id) throws Exception {
@@ -169,10 +212,50 @@ public class EmployeeController {
         return (2*day)+1;
     }
 
-    public Constraint getWeekConstraint(int id) throws Exception {
+    public Constraint getWeekConstraints(int id) throws Exception {
         if(!constraintsByEId.containsKey(id))throw new Exception("Employee with ID:" + id + " not exists!");
         return constraintsByEId.get(id);
     }
+
+    public void printWeeklyConstraints(int id) throws Exception {
+        if(!constraintsByEId.containsKey(id))throw new Exception("Employee with ID:" + id + " not exists!");
+        Constraint c = constraintsByEId.get(id);
+        Map<Integer,Map<String,Boolean>> table = c.getWeeklyAvailability();
+        printAvailabilityTable(table);
+    }
+
+    public static void printAvailabilityTable(Map<Integer, Map<String, Boolean>> availability) {
+        // Define day names
+        String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
+
+        // Define time periods (rows)
+        String[] periods = {"Morning", "Evening"};
+
+        // Print the table header
+        System.out.printf("%-10s", "");
+        for (int i = 0; i <= 5; i++) {
+            System.out.printf("%-15s", days[i]);
+        }
+        System.out.println();
+
+        // Print a separating line
+        System.out.println("--------------------------------------------------------------------------------------");
+
+        // Print the table rows for each period
+        for (String period : periods) {
+            System.out.printf("%-10s", period);
+            for (int i = 0; i <= 5; i++) {
+                Map<String, Boolean> innerMap = availability.get(i);
+                Boolean value = innerMap != null ? innerMap.get(period) : null;
+                System.out.printf("%-15s", value != null ? value.toString() : "N/A");
+            }
+            System.out.println();
+
+            // Print a separating line
+            System.out.println("--------------------------------------------------------------------------------------");
+        }
+    }
+
 
     public boolean getShiftConstraint(int id, int day, String shift) throws Exception {
         if(!constraintsByEId.containsKey(id))throw new Exception("Employee with ID:" + id + " not exists!");
@@ -193,5 +276,35 @@ public class EmployeeController {
         return true;
         }
 
+
+    public void login(String eName, String password) throws Exception {
+        try{Integer ids = Integer.parseInt(eName);
+            if(!employeesById.containsKey(ids)) throw new Exception("Employee with ID:"+ ids + "not exists!");
+            if(employeesById.get(ids).isOnline()) throw new Exception("Employee with ID:"+ ids + "is already online!");
+            Employee employee = getEmployee(ids);
+            employee.login(eName, password);} catch (Exception e){throw new Exception("User Name is Invalid!");}
+    }
+
+    public void logout(int id) throws Exception {
+        Employee employee = getEmployee(id);
+        if(!employeesById.containsKey(id)) throw new Exception("Employee with ID:"+ id + "not exists!");
+        if(!employee.isOnline()) throw new Exception("Employee is not online!");
+        employee.logout();
+    }
+
+    public String pirntEmployee(int id) throws Exception {
+        Employee employee = getEmployee(id);
+        if(!employeesById.containsKey(id)) throw new Exception("Employee with ID:"+ id + "not exists!");
+        return employee.stringToSystem();
+    }
+
+
+    // Week Work Arrangement
+    public void setConstraintRegistrationOpen(boolean status) throws Exception {
+        isConstraintRegistrationOpen = status;
+    }
+    public boolean isConstraintRegistrationOpen() throws Exception {
+        return isConstraintRegistrationOpen;
+    }
 
 }

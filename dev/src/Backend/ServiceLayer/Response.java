@@ -25,7 +25,7 @@ public class Response {
     }
 
     public String toString() {
-        return "BaseResponse [errorMessage=" + errorMessage + "]";
+        return "Response [errorMessage=" + errorMessage + "]";
     }
 }
 

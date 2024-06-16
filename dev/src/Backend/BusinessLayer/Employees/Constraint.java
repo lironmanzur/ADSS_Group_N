@@ -13,8 +13,14 @@ public class Constraint {
     public Constraint(int empId) {
         this.empId = empId;
         this.availability = new HashMap<>();
+        initializeAvailability();
 
     }
+
+    public Map<Integer,Map<String,Boolean>> getWeeklyAvailability() {
+        return availability;
+    }
+
 
     public int getEmpId() {
         return empId;
@@ -36,7 +42,7 @@ public class Constraint {
     }
 
     public void setAvailability(int day, String shift, boolean isAvailable)throws Exception {
-        if(day>5 || day<0 || ShiftType.isShiftValid(shift)) throw new Exception("Invalid shift!");
+        if(day>5 || day<0 || (!ShiftType.isShiftValid(shift))) throw new Exception("Invalid shift!");
         availability.get(day).put(shift, isAvailable);
     }
 

@@ -2,8 +2,7 @@ package Backend.BusinessLayer.Tools;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -96,6 +95,14 @@ public class DateConvertor {
         }
 
         return -1;
+    }
+    public LocalDate convertToLocalDate(Date dateToConvert) {
+        return dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+    public Date convertToDate(LocalDate localDate) {
+        ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());
+        Instant instant = zonedDateTime.toInstant();
+        return Date.from(instant);
     }
 
     public Date stringToDate(String s) {
