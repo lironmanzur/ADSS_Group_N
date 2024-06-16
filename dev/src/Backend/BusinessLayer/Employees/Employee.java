@@ -18,6 +18,7 @@ public class Employee {
     private String branch;
     private boolean isBusy;
     private Constraint constraint;
+    private boolean isOnline;
 
 
     public Employee(int id, String name, int salary, int bankNumber, Date firstDay, String phoneNumber,String branch) throws Exception{
@@ -34,6 +35,7 @@ public class Employee {
         this.branch = branch;
         this.isBusy = false;
         this.constraint = new Constraint(id);
+        this.isOnline = false;
 
     }
     //getters
@@ -49,6 +51,7 @@ public class Employee {
     public String getBranch(){return this.branch;}
     public boolean isBusy(){return this.isBusy;}
     public Constraint getConstraint(){return this.constraint;}
+
 
 
     //setters
@@ -79,11 +82,36 @@ public class Employee {
         return ro;
     }
 
+    //system login/logout
+    public void login(String UserName, String password) throws Exception{
+        String eUN = String.format("%d", id);
+        String ePW = String.format("%d", bankNumber);
+        if(Objects.equals(UserName, eUN) && Objects.equals(password, ePW)) isOnline = true;
+        else throw new Exception("Username/Password is incorrect");
+    }
+    public void logout() throws Exception{
+        isOnline = false;
+    }
+    public boolean isOnline() {
+        return isOnline;
+    }
+
     public String toString() {
         return String.format("Employee{name='%s', id=%d, salary=%.2f, bankAccountNumber='%s', roles=%s, startDate=%s}",
                 name, id, salary, bankNumber, roles, firstDay);
 
 }
+public String stringToSystem(){
+    return
+            "Name:'" + name + '\'' +
+            ", ID:" + id +
+            ",Roles:"+ roles+
+            ", Salary:" + salary +
+            ", Bank Account:" + bankNumber +
+            ", Start Date:" + firstDay+
+            ", Phone Number:"+ phoneNumber;
+}
+
 
 }
 
