@@ -38,7 +38,6 @@ public class ShiftController {
                 Date curDay = dateConvertor.convertToDate(ld.plusDays(i));
                 addShift(curDay,"Morning",branch);
                 addShift(curDay,"Evening",branch);
-
             }
         }
 
