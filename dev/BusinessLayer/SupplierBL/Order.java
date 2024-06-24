@@ -1,6 +1,7 @@
 package dev.BusinessLayer.SupplierBL;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,26 +87,75 @@ public class Order {
 
 
 
-    public double calculatePrice(){
-        double sum=0;
-        for (Item item:this.items.keySet()){
-            sum+=item.getPrice()*items.get(item);
+    public double calculatePrice() {
+        BigDecimal totalPrice = BigDecimal.ZERO;
+
+        for (Map.Entry<Item, Integer> entry : items.entrySet()) {
+            Item item = entry.getKey();
+            int quantity = entry.getValue();
+            BigDecimal itemPrice = BigDecimal.valueOf(item.getPrice());
+
+            Map<Integer, Float> itemDiscounts = supplier.getDiscountNote().getDiscounts().get(item);
+            if (itemDiscounts != null) {
+                BigDecimal maxApplicableDiscountPrice = findMaxApplicableDiscountPrice(itemDiscounts, quantity);
+                if (maxApplicableDiscountPrice != null) {
+                    itemPrice = maxApplicableDiscountPrice; // Set item price to the discounted price
+                }
+            }
+
+            totalPrice = totalPrice.add(itemPrice.multiply(BigDecimal.valueOf(quantity)));
         }
-        return sum;
+
+        return totalPrice.setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 
-    public double calculateDiscount(DiscountNote discountNote){
-        double sum=0;
-        for (Item item:this.items.keySet()){
-            if (!discountNote.getDisscounts().keySet().contains(item)){
-                sum+=item.getPrice()*items.get(item);
-            }
-            else {
-                sum+=calculateItemDiscount(item, discountNote.getDisscounts().get(item), items.get(item))*items.get(item);
+    /**
+     * Finds the maximum applicable discount price for the given quantity.
+     * It searches through all discounts and selects the highest discount price
+     * for which the item quantity meets or exceeds the discount threshold.
+     */
+    private BigDecimal findMaxApplicableDiscountPrice(Map<Integer, Float> discounts, int quantity) {
+        BigDecimal maxPrice = null;
+
+        for (Map.Entry<Integer, Float> discountEntry : discounts.entrySet()) {
+            if (quantity >= discountEntry.getKey()) { // Check if quantity is sufficient for the discount
+                BigDecimal discountPrice = BigDecimal.valueOf(discountEntry.getValue());
+                if (maxPrice == null || discountPrice.compareTo(maxPrice) > 0) {
+                    maxPrice = discountPrice; // Update max price if this discount is higher
+                }
             }
         }
-        return sum;
+
+        return maxPrice;
     }
+
+
+
+
+    public double calculateDiscount(DiscountNote discountNote) {
+        BigDecimal sum = BigDecimal.ZERO;  // Use BigDecimal for accurate sum calculations
+
+        for (Item item : this.items.keySet()) {
+            BigDecimal itemPrice = BigDecimal.valueOf(item.getPrice());
+            int quantity = items.get(item);
+
+            if (!discountNote.getDiscounts().keySet().contains(item)) {
+                sum = sum.add(itemPrice.multiply(BigDecimal.valueOf(quantity)));
+            } else {
+                BigDecimal discountedPrice = BigDecimal.valueOf(calculateItemDiscount(item, discountNote.getDiscounts().get(item), quantity));
+                sum = sum.add(discountedPrice.multiply(BigDecimal.valueOf(quantity)));
+            }
+        }
+
+        // Rounding the sum to 2 decimal places
+        sum = sum.setScale(2, RoundingMode.HALF_UP);
+        return sum.doubleValue();  // Convert BigDecimal back to double for return
+    }
+
+    /**
+     * This method needs to return a BigDecimal if used in a BigDecimal context
+     * for consistency, or you should handle the conversion within this method.
+     */
 
     public static double calculateItemDiscount( Item item, Map<Integer, Float> map, int count){
         double price=0;

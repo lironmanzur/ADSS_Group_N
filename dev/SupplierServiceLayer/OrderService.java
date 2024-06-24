@@ -27,10 +27,13 @@ public class OrderService {
         return -1;  // Return -1 or throw an exception if supplier not found
     }
 
-    public String addItemToOrder(int orderId, String itemName, float price, int quantity) {
+    public String addItemToOrder(int orderId, String itemName, int quantity) {
         Order order = orders.get(orderId);
         if (order != null) {
-            Item item = new Item(itemName, price, itemID ++);  // Assume you can create a new Item here
+            Supplier supplier = order.getSupplier();
+            Item item = supplier.getItemByName(itemName);
+            // Assume you can create a new Item here
+            if (item == null) return "Item not found";
             order.addItem(item, quantity);
             return "Item added successfully.";
         }
@@ -39,10 +42,12 @@ public class OrderService {
 
     public double calculateOrderPrice(int orderId) {
         Order order = orders.get(orderId);
-        if (order != null) {
+//        DiscountNote discountNote = order.getSupplier().getDiscountNote();
+//        if (discountNote != null) return order.calculateDiscount(discountNote);
+//        else if (order != null) {
             return order.calculatePrice();
-        }
-        return 0.0;
+  //      }
+//        return 0.0;
     }
 
     public double calculateOrderDiscountedPrice(int orderId) {

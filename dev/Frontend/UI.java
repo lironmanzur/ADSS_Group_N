@@ -1,11 +1,14 @@
 package dev.Frontend;
 
+import dev.BusinessLayer.SupplierBL.DiscountNote;
+import dev.BusinessLayer.SupplierBL.Item;
+import dev.BusinessLayer.SupplierBL.Order;
+import dev.BusinessLayer.SupplierBL.Supplier;
 import dev.SupplierServiceLayer.OrderService;
 import dev.SupplierServiceLayer.SupplierService;
-import java.util.List;
-import java.util.Scanner;
+
+import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class UI {
     static SupplierService supplierService = new SupplierService();
@@ -15,7 +18,9 @@ public class UI {
     static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
 
     public static void main(String[] args) {
-        loadDemoData();
+        System.out.println("would you like to load demo data? \nif yes enter 'y'. else enter 'n' ");
+        String ans = scanner.nextLine();
+        if (ans.equals("y") || ans.equals("Y")){ loadDemoData();}
 
         String[] options = {
                 "1) Add a new supplier",
@@ -28,6 +33,7 @@ public class UI {
                 "8) Calculate order price",
                 "9) Set order delivery date",
                 "a) List Suppliers",
+                "b) Add discount to supplier",
                 "0) Exit"
 
         };
@@ -69,6 +75,9 @@ public class UI {
                     case 'a':
                         listSuppliers();
                         break;
+                    case 'b':
+                        assDiscountToSupplier();
+                        break;
                     case '0':
                         System.out.println("Exiting...");
                         return;
@@ -82,6 +91,20 @@ public class UI {
     private static void listSuppliers() {
         System.out.println( supplierService.getSuppliers());
     }
+
+    private static void assDiscountToSupplier() {
+        System.out.println("choose a suplier: here is a list of supliers\n" + supplierService.getSuppliers());
+        String supplierName = scanner.nextLine();
+        System.out.println("enter item name\n");
+        String itemName = scanner.nextLine();
+        System.out.println("enter item Ammount\n");
+        String itemAmmount = scanner.nextLine();
+        System.out.println("enter item price\n");
+        String itemprice = scanner.nextLine();
+        System.out.println(supplierService.addDiscountToSupplier(supplierName, itemName, itemAmmount, itemprice));
+
+    }
+
 
     static void createOrder() {
         System.out.println("Enter supplier name for the order:");
@@ -100,16 +123,19 @@ public class UI {
             int orderId = Integer.parseInt(scanner.nextLine());
             System.out.println("Enter item name:");
             String itemName = scanner.nextLine();
-            System.out.println("Enter item price:");
-            float price = Float.parseFloat(scanner.nextLine());
+//            System.out.println("Enter item price:");
+//            float price = Float.parseFloat(scanner.nextLine());
             System.out.println("Enter quantity:");
             int quantity = Integer.parseInt(scanner.nextLine());
-            String result = orderService.addItemToOrder(orderId, itemName, price, quantity);
+            String result = orderService.addItemToOrder(orderId, itemName, quantity);
             System.out.println(result);
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Please ensure all entries are correct.");
         }
     }
+
+
+
 
     static void calculateOrderPrice() {
         System.out.println("Enter order ID:");
@@ -211,11 +237,11 @@ public class UI {
 
         // Creating Orders
         int orderA = orderService.createOrder("Supplier A");
-        orderService.addItemToOrder(orderA, "Widget", 3.50f, 10);
-        orderService.addItemToOrder(orderA, "Gadget", 2.75f, 5);
+        orderService.addItemToOrder(orderA, "Widget", 10);
+        orderService.addItemToOrder(orderA, "Gadget", 5);
 
         int orderB = orderService.createOrder("Supplier B");
-        orderService.addItemToOrder(orderB, "Gizmo", 1.99f, 20);
+        orderService.addItemToOrder(orderB, "Gizmo", 20);
 
         // Optionally, pre-setting some order dates
         try {

@@ -1,6 +1,8 @@
 package dev.BusinessLayer.SupplierBL;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Supplier {
     private String name;
@@ -13,6 +15,17 @@ public class Supplier {
     public void setDiscountNote(DiscountNote discountNote) {
         this.discountNote = discountNote;
     }
+
+    public void createEmptyDiscountNote(){
+        if (discountNote == null) discountNote = new DiscountNote(new HashMap<Item, Map<Integer, Float>>());
+    }
+    public void addDiscount(Item item, Map<Integer, Float> map){
+        createEmptyDiscountNote();
+        discountNote.getDiscounts().put(item, map);
+
+    }
+
+
 
     public DiscountNote getDiscountNote() {
         return discountNote;

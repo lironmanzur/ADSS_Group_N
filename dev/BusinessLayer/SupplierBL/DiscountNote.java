@@ -18,7 +18,9 @@ public class DiscountNote {
         this.disscounts = disscounts;
     }
 
-    public Map<Item, Map<Integer, Float>> getDisscounts() {
+    public Map<Item, Map<Integer, Float>> getDiscounts() {
         return disscounts;
     }
+
+
 }
