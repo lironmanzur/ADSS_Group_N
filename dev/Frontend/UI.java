@@ -16,6 +16,7 @@ public class UI {
 
     public static void main(String[] args) {
         loadDemoData();
+
         String[] options = {
                 "1) Add a new supplier",
                 "2) Add item to a supplier",
