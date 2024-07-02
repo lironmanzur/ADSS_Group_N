@@ -15,6 +15,9 @@ public class Order {
     private double totalPriceBeforeDiscount;
     private double totalPriceAfterDiscount;
     Supplier supplier;
+    static long idCounter = 965;
+    long id = idCounter++;
+
 
     public Order(Supplier supplier, Map<Item, Integer> items) {
         this.items = items;
@@ -171,5 +174,9 @@ public class Order {
     public void addItem(Item item, int i) {
         if (items == null) items = new HashMap<>();
         items.put(item, (Integer) i);
+    }
+
+    public long getId() {
+        return id;
     }
 }

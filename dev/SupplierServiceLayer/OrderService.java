@@ -1,5 +1,7 @@
 package dev.SupplierServiceLayer;
 import dev.BusinessLayer.SupplierBL.*;
+
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +16,61 @@ public class OrderService {
         this.orders = new HashMap<>();
         this.currentOrderId = 1;
         this.supplierService = supplierService;
+        //assuming the program runs daily
+        sendMemos();
+    }
+
+    public int getQuantityOfItem(int itemID){
+        int quantity = 20;//demo value
+        //todo ask for stock module for the quantity of the item
+        return quantity;
+    }
+    public int getItemMinQuantity(int itemID){
+        int minQuantity = 10;//demo value
+        //todo ask for stock module for the minimum quantity of the item
+        return minQuantity;
+    }
+    public void sendMemo(Supplier supplier){
+        //todo send memo to stock module to send in order to the supplier
+    }
+    public void sendMemos(){
+        for (Supplier supplier : supplierService.getSuppliersList()){
+            //if suplier is instance of stationary
+            if(supplier instanceof StationarySupplier){
+                StationarySupplier stationarySupplier = (StationarySupplier) supplier;
+                stationarySupplier.getDeliveryDays().forEach(day -> {
+                    if(day.equals(LocalDate.now().plusDays(1).getDayOfWeek())){
+                        sendMemo(stationarySupplier);
+}
+                });
+            }
+
+        }
+    }
+
+    public void createShortageOrder(int itemID, int quantity){
+        Order order = getCheapestOrder(itemID, quantity);
+        if(order == null){
+            System.out.println("No supplier found for item " + itemID);
+            return;
+        }
+        orders.put(currentOrderId++, order);
+    }
+    public Order getCheapestOrder(int itemID, int quantity){
+        Order returnOrder = null;
+        double minPrice = Double.MAX_VALUE;
+        for(Supplier supplier : supplierService.getSuppliersList()){
+            if(supplier.getItemByID(itemID) != null){
+                Order order = new Order(supplier);
+                order.addItem(supplier.getItemByID(itemID), quantity);
+                double price = order.calculatePrice();
+                if(price < minPrice){
+                    minPrice = price;
+                    returnOrder = order;
+                }
+            }
+        }
+        return returnOrder;
     }
 
     public int createOrder(String supplierName) {

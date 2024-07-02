@@ -50,7 +50,7 @@ public class OrderTest {
 
     // Helper method to create an order with sample items
     private static Order createSampleOrder() {
-        Order order = new Order(new MobileSupplier("moshe hagag", "beer-sheva"));
+        Order order = new Order(new Supplier("moshe hagag", "beer-sheva"));
         order.addItem(new Item("Apple", 1, 45), 5);
         order.addItem(new Item("Banana", 3, 235748), 10);
         order.addItem(new Item("Orange", 1.5f, 4256789), 15);

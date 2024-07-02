@@ -1,5 +1,7 @@
 package dev.SupplierServiceLayer;
 import dev.BusinessLayer.SupplierBL.*;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,6 +105,21 @@ public class SupplierService {
         }
         return itemList; // Empty list if no items or supplier not found
     }
+    //every morning this function will run
+    public void automatedOrder(){
+        for(Supplier supplier: suppliers.values()){
+            if (supplier instanceof StationarySupplier){
+                StationarySupplier stationarySupplier = (StationarySupplier) supplier;
+                if (stationarySupplier.getDeliveryDays().contains(LocalDate.now().getDayOfWeek())) performAutomaticOrder(stationarySupplier);
+
+            }
+
+        }
+    }
+
+    private void performAutomaticOrder(StationarySupplier stationarySupplier) {
+        //todo implement
+    }
 
     public String addSupplier(String name, String address) {
         if (suppliers.containsKey(name)) return "A supplier with the name " + name + " already exists.";
@@ -127,4 +144,8 @@ public class SupplierService {
         return suppliers.toString();
 
     }
+    public ArrayList<Supplier> getSuppliersList(){
+        return new ArrayList<>(suppliers.values());
+    }
+
 }

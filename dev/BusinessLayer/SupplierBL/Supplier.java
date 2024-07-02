@@ -2,15 +2,26 @@ package dev.BusinessLayer.SupplierBL;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Supplier {
     private String name;
     private String address;
+    static int idCounter = 435;
+    int id = idCounter++;
+    private DiscountNote discountNote;
+    private ArrayList<Contact> contacts;  // List of contact persons
+    private ArrayList<Item> items;
 
-    public SupplierCard getCard() {
-        return card;
+    public Supplier(String name, String address) {
+        this.name = name;
+        this.address = address;
+        this.contacts = new ArrayList<Contact>();
+        this.items = new ArrayList<Item>();
     }
+
+
 
     public void setDiscountNote(DiscountNote discountNote) {
         this.discountNote = discountNote;
@@ -29,18 +40,6 @@ public class Supplier {
 
     public DiscountNote getDiscountNote() {
         return discountNote;
-    }
-
-    private DiscountNote discountNote;
-    private SupplierCard card;
-    private ArrayList<Contact> contacts;  // List of contact persons
-    private ArrayList<Item> items;
-
-    public Supplier(String name, String address) {
-        this.name = name;
-        this.address = address;
-        this.contacts = new ArrayList<Contact>();
-        this.items = new ArrayList<Item>();
     }
 
     public String getName() {
@@ -90,5 +89,30 @@ public class Supplier {
             }
         }
         return null;  // Return null if no item matches the given name
+    }
+
+    public Item getItemByID(int itemID) {
+        for (Item item : items) {
+            if (item.getItemID() == itemID) {
+                return item;
+            }
+        }
+        return null;  // Return null if no item matches the given ID
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setItems(List<Item> itemsBySupplierId) {
+        this.items = new ArrayList<>(itemsBySupplierId);
+    }
+
+    public void setContacts(List<Contact> contactsBySupplierId) {
+        this.contacts = new ArrayList<>(contactsBySupplierId);
+    }
+
+    public void setId(int supplierId) {
+        this.id = supplierId;
     }
 }
