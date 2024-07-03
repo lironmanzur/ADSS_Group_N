@@ -3,6 +3,7 @@ package dev.DataLayer.DAO;
 import dev.BusinessLayer.SupplierBL.DiscountNote;
 import dev.BusinessLayer.SupplierBL.Item;
 import dev.DataLayer.DTO.DiscountNoteDTO;
+import dev.DataLayer.DatabaseConnection;
 
 import java.sql.*;
 import java.util.HashMap;
@@ -10,15 +11,37 @@ import java.util.List;
 import java.util.Map;
 
 public class DiscountNoteDAO {
+    Connection connection;
 
-    private static final String URL = "jdbc:mysql://localhost:3306/yourdatabase";
-    private static final String USER = "yourusername";
-    private static final String PASSWORD = "yourpassword";
+    public DiscountNoteDAO() {
+        try {
+            connection = DatabaseConnection.getConnection();
+            createTableIfNotExists();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createTableIfNotExists() {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS discountnote ("
+                + "id INT AUTO_INCREMENT PRIMARY KEY, "
+                + "name VARCHAR(255) NOT NULL, "
+                + "price DOUBLE NOT NULL"
+                + ")";
+
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(createTableSQL);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error creating table: " + e.getMessage(), e);
+        }
+    }
+
 
     // Method to save a DiscountNote to the database
     public void saveDiscountNote(DiscountNote discountNote) throws SQLException {
         String sql = "INSERT INTO discount_notes (item_name, quantity, discount_price) VALUES (?, ?, ?)";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             for (Map.Entry<Item, Map<Integer, Float>> entry : discountNote.getDiscounts().entrySet()) {
@@ -37,7 +60,7 @@ public class DiscountNoteDAO {
     public DiscountNote getDiscountNoteBySupplierName(String supplierName) throws SQLException {
         String sql = "SELECT * FROM discount_notes WHERE item_name = ?";
         Map<Item, Map<Integer, Float>> discounts = new HashMap<>();
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, supplierName);
@@ -58,7 +81,7 @@ public class DiscountNoteDAO {
     public DiscountNote getDiscountNoteByItemName(String itemName) throws SQLException {
         String sql = "SELECT * FROM discount_notes WHERE item_name = ?";
         Map<Item, Map<Integer, Float>> discounts = new HashMap<>();
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, itemName);
@@ -83,7 +106,7 @@ public class DiscountNoteDAO {
     // Method to delete a DiscountNote from the database by item name
     public void deleteDiscountNoteByItemName(String itemName) throws SQLException {
         String sql = "DELETE FROM discount_notes WHERE item_name = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, itemName);
             pstmt.executeUpdate();
@@ -94,7 +117,7 @@ public class DiscountNoteDAO {
         //return all items by supplier id
         String sql = "SELECT * FROM discount_notes WHERE supplier_id = ?";
         Map<Item, Map<Integer, Float>> discounts = new HashMap<>();
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setLong(1, supplierId);

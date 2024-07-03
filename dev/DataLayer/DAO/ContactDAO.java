@@ -1,21 +1,47 @@
 package dev.DataLayer.DAO;
 
 import dev.BusinessLayer.SupplierBL.Contact;
+import dev.DataLayer.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ContactDAO {
+    Connection connection;
 
-    private static final String URL = "jdbc:mysql://localhost:3306/yourdatabase";
-    private static final String USER = "yourusername";
-    private static final String PASSWORD = "yourpassword";
+
+
+    public ContactDAO() {
+        try {
+            connection = DatabaseConnection.getConnection();
+            createTableIfNotExists();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createTableIfNotExists() {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS contacts ("
+                + "id INT AUTO_INCREMENT PRIMARY KEY, "
+                + "name VARCHAR(255) NOT NULL, "
+                + "price DOUBLE NOT NULL"
+                + ")";
+
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(createTableSQL);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error creating table: " + e.getMessage(), e);
+        }
+    }
+
+
 
     // Method to add a new contact to the database
     public void addContact(Contact contact) throws SQLException {
         String sql = "INSERT INTO contacts (name, phone_number, address) VALUES (?, ?, ?)";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, contact.getName());
             pstmt.setString(2, contact.getPhoneNumber());
@@ -27,7 +53,7 @@ public class ContactDAO {
     // Method to get a contact by name from the database
     public Contact getContactByName(String name) throws SQLException {
         String sql = "SELECT * FROM contacts WHERE name = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, name);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -47,7 +73,7 @@ public class ContactDAO {
     public List<Contact> getAllContacts() throws SQLException {
         List<Contact> contacts = new ArrayList<>();
         String sql = "SELECT * FROM contacts";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -65,7 +91,7 @@ public class ContactDAO {
     // Method to update a contact in the database
     public void updateContact(Contact contact) throws SQLException {
         String sql = "UPDATE contacts SET phone_number = ?, address = ? WHERE name = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, contact.getPhoneNumber());
             pstmt.setString(2, contact.getAddress());
@@ -77,7 +103,7 @@ public class ContactDAO {
     // Method to delete a contact from the database
     public void deleteContact(String name) throws SQLException {
         String sql = "DELETE FROM contacts WHERE name = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, name);
             pstmt.executeUpdate();
@@ -89,7 +115,7 @@ public class ContactDAO {
         //return all contacts by supplier id
         String sql = "SELECT * FROM contacts WHERE supplier_id = ?";
         List<Contact> contacts = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, supplierId);
             try (ResultSet rs = pstmt.executeQuery()) {

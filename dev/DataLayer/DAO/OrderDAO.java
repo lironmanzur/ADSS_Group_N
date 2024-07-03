@@ -3,6 +3,7 @@ package dev.DataLayer.DAO;
 import dev.BusinessLayer.SupplierBL.Item;
 import dev.BusinessLayer.SupplierBL.Order;
 import dev.BusinessLayer.SupplierBL.Supplier;
+import dev.DataLayer.DatabaseConnection;
 
 import java.sql.*;
 import java.sql.Date;
@@ -11,9 +12,32 @@ import java.util.*;
 
 public class OrderDAO {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/yourdatabase";
-    private static final String USER = "yourusername";
-    private static final String PASSWORD = "yourpassword";
+    Connection connection;
+
+    public OrderDAO() {
+        try {
+            connection = DatabaseConnection.getConnection();
+            createTableIfNotExists();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createTableIfNotExists() {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS Order ("
+                + "id INT AUTO_INCREMENT PRIMARY KEY, "
+                + "name VARCHAR(255) NOT NULL, "
+                + "price DOUBLE NOT NULL"
+                + ")";
+
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(createTableSQL);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error creating table: " + e.getMessage(), e);
+        }
+    }
+
 
     private SupplierDAO supplierDAO;
     private ItemDAO itemDAO;
@@ -26,7 +50,7 @@ public class OrderDAO {
     // Method to add an Order to the database
     public void addOrder(Order order) throws SQLException {
         String sql = "INSERT INTO orders (supplier_id, create_date, providing_date, delivered, total_price_before_discount, total_price_after_discount) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setLong(1, order.getSupplier().getId());
             pstmt.setDate(2, new java.sql.Date(order.getCreatDate().getTime()));
@@ -48,7 +72,7 @@ public class OrderDAO {
     // Method to get an Order by ID from the database
     public Order getOrderById(long orderId) throws SQLException {
         String sql = "SELECT * FROM orders WHERE order_id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, orderId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -81,7 +105,7 @@ public class OrderDAO {
     public List<Order> getAllOrders() throws SQLException {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT * FROM orders";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -95,7 +119,7 @@ public class OrderDAO {
     // Method to update an Order in the database
     public void updateOrder(Order order) throws SQLException {
         String sql = "UPDATE orders SET supplier_id = ?, create_date = ?, providing_date = ?, delivered = ?, total_price_before_discount = ?, total_price_after_discount = ? WHERE order_id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, order.getSupplier().getId());
             pstmt.setDate(2, new java.sql.Date(order.getCreatDate().getTime()));
@@ -114,7 +138,7 @@ public class OrderDAO {
     // Method to delete an Order from the database
     public void deleteOrderById(long orderId) throws SQLException {
         String sql = "DELETE FROM orders WHERE order_id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, orderId);
             pstmt.executeUpdate();

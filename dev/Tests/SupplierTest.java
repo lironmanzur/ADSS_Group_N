@@ -119,7 +119,7 @@ public class SupplierTest {
         newWidgetDiscounts.put(5, 22.0f);
         Map<Item, Map<Integer, Float>> discountMap = new HashMap<>();
         discountMap.put(widget, newWidgetDiscounts);
-        discountNote.setDisscounts(discountMap);
+        discountNote.setDiscounts(discountMap);
 
         System.out.println(discountNote.getDiscounts().get(widget).get(5) == 22.0f ? TEST_PASSED : TEST_FAILED);
     }

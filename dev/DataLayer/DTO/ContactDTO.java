@@ -1,42 +1,37 @@
 package dev.DataLayer.DTO;
 
 public class ContactDTO {
-    private Long id;
     private String name;
-    private String email;
-    private String phone;
+    private String phoneNumber;
+    private String Address;
 
-    // Getters and Setters
-
-    public Long getId() {
-        return id;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getEmail() {
-        return email;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void setAddress(String address) {
+        Address = address;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getAddress() {
+        return Address;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
+    public ContactDTO(String name, String phoneNumber, String address){
+        this.Address = address;
+        this.phoneNumber = phoneNumber;
         this.name = name;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 }

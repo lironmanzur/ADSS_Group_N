@@ -1,6 +1,7 @@
 package dev.DataLayer.DAO;
 
 import dev.BusinessLayer.SupplierBL.*;
+import dev.DataLayer.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,10 +11,8 @@ import java.util.Map;
 
 public class SupplierDAO {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/yourdatabase";
-    private static final String USER = "yourusername";
-    private static final String PASSWORD = "yourpassword";
 
+    Connection connection;
     private ItemDAO itemDAO;
     private ContactDAO contactDAO;
     private DiscountNoteDAO discountNoteDAO;
@@ -22,12 +21,33 @@ public class SupplierDAO {
         this.itemDAO = itemDAO;
         this.contactDAO = contactDAO;
         this.discountNoteDAO = discountNoteDAO;
+        try {
+            connection = DatabaseConnection.getConnection();
+            createTableIfNotExists();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createTableIfNotExists() {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS Supplier ("
+                + "id INT AUTO_INCREMENT PRIMARY KEY, "
+                + "name VARCHAR(255) NOT NULL, "
+                + "price DOUBLE NOT NULL"
+                + ")";
+
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(createTableSQL);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error creating table: " + e.getMessage(), e);
+        }
     }
 
     // Method to add a Supplier to the database
     public void addSupplier(Supplier supplier) throws SQLException {
         String sql = "INSERT INTO suppliers (name, address) VALUES (?, ?)";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, supplier.getName());
             pstmt.setString(2, supplier.getAddress());
@@ -47,7 +67,7 @@ public class SupplierDAO {
     // Method to get a Supplier by name from the database
     public Supplier getSupplierByName(String name) throws SQLException {
         String sql = "SELECT * FROM suppliers WHERE name = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, name);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -71,7 +91,7 @@ public class SupplierDAO {
     public List<Supplier> getAllSuppliers() throws SQLException {
         List<Supplier> suppliers = new ArrayList<>();
         String sql = "SELECT * FROM suppliers";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -93,7 +113,7 @@ public class SupplierDAO {
     // Method to update a Supplier in the database
     public void updateSupplier(Supplier supplier) throws SQLException {
         String sql = "UPDATE suppliers SET address = ? WHERE name = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, supplier.getAddress());
             pstmt.setString(2, supplier.getName());
@@ -109,7 +129,7 @@ public class SupplierDAO {
     // Method to delete a Supplier from the database
     public void deleteSupplierByName(String name) throws SQLException {
         String sql = "DELETE FROM suppliers WHERE name = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             long supplierId = getSupplierIdByName(name, conn);
             deleteSupplierItems(supplierId, conn);
@@ -178,7 +198,7 @@ public class SupplierDAO {
 
     public Supplier getSupplierById(long supplierId) {
         String sql = "SELECT * FROM suppliers WHERE supplier_id = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, supplierId);
             try (ResultSet rs = pstmt.executeQuery()) {

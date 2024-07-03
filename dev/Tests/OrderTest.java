@@ -1,14 +1,19 @@
 package dev.Tests;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import dev.BusinessLayer.SupplierBL.*;
+import dev.DataLayer.DAO.ItemDAO;
+import dev.DataLayer.DatabaseConnection;
 
 public class OrderTest {
 
     public static void main(String[] args) {
         // Test Setup
-        testCalculatePrice();
-        testCalculateDiscount();
+        testItemDAO();
+//        testCalculatePrice();
+//        testCalculateDiscount();
     }
 
     public static void testCalculatePrice() {
@@ -47,6 +52,36 @@ public class OrderTest {
             System.out.println("Test failed: Expected discounted price " + expectedDiscountedPrice + ", but got " + calculatedDiscountedPrice + ".");
         }
     }
+    private static boolean testItemDAO(){
+        try {
+            Connection connection = DatabaseConnection.getConnection();
+            ItemDAO itemDAO = new ItemDAO();
+            Item item = new Item("Applqe", 1, 44325);
+            itemDAO.addItem(item);
+            Item itemFromDB = itemDAO.getItemById(item.getItemId());
+            System.out.println("Item: " + item.getItemName());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
+//        ItemDAO itemDAO = new ItemDAO();
+//        Item item = new Item("Apple", 1, 45);
+//        try {
+//            itemDAO.addItem(item);
+//            Item itemFromDB = itemDAO.getItemById(item.getItemId());
+//            if (item.equals(itemFromDB)) {
+//                System.out.println("Test passed: Item saved and retrieved successfully.");
+//                return true;
+//            } else {
+//                System.out.println("Test failed: Item saved and retrieved, but they are not equal.");
+//                return false;
+//            }
+//        } catch (Exception e) {
+//            System.out.println("Test failed: Exception occurred while saving or retrieving item.");
+//            e.printStackTrace();
+//            return false;
+//        }
+    }
 
     // Helper method to create an order with sample items
     private static Order createSampleOrder() {
@@ -59,6 +94,7 @@ public class OrderTest {
         return order;
     }
 
+
     // Helper method to create a sample discount note
     private static DiscountNote createSampleDiscountNote() {
         Map<Item, Map<Integer, Float>> discountMap = new HashMap<>();
@@ -67,7 +103,7 @@ public class OrderTest {
         discountMap.put(new Item("Mango", 2.0f, 678839), createDiscountMap(20, 1.8f));
         discountMap.put(new Item("Pineapple", 3.0f, 324), createDiscountMap(25, 2.5f));
         DiscountNote discountNote = new DiscountNote();
-        discountNote.setDisscounts(discountMap);
+        discountNote.setDiscounts(discountMap);
         return discountNote;
     }
 
