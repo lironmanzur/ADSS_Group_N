@@ -197,4 +197,14 @@ public class SupplierService {
     public ItemDAO getItemDAO() {
         return itemDAO;
     }
+
+    public String addContactForSupplier(String name, String contactName, String phoneNumber, String address) {
+        Supplier supplier = suppliers.get(name);
+        if (supplier == null) {
+            return "Supplier not found.";
+        }
+        Contact contact = new Contact(contactName, phoneNumber, address, supplier);
+        supplier.addContact(contact);
+        return "Contact added successfully.";
+    }
 }

@@ -243,6 +243,29 @@ public class UI {
         String address = scanner.nextLine();
         String answer = supplierService.addSupplier(name, address);
         System.out.println(answer);
+        if (answer.endsWith("successfully.")) {
+            System.out.println("Would you like to add a contact for this supplier? (y/n)");
+            String choise = scanner.nextLine();
+            if (choise.equals("y") || choise.equals("Y")) {
+                addContactForSupplier(name);
+            }
+        }
+    }
+
+    private static void addContactForSupplier(String name) {
+        System.out.println("Please enter contact name:");
+        String contactName = scanner.nextLine();
+        System.out.println("Please enter contact phone number:");
+        String phoneNumber = scanner.nextLine();
+        System.out.println("Please enter contact address:");
+        String address = scanner.nextLine();
+        String result = supplierService.addContactForSupplier(name, contactName, phoneNumber, address);
+        System.out.println(result);
+        System.out.println("would you like to add another contact? (y/n)");
+        String choise = scanner.nextLine();
+        if (choise.equals("y") || choise.equals("Y")) {
+            addContactForSupplier(name);
+        }
     }
 
     static void loadDemoData() {
