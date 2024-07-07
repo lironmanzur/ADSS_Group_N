@@ -11,8 +11,8 @@ import java.util.*;
 import java.text.SimpleDateFormat;
 
 public class UI {
-    static SupplierService supplierService = new SupplierService();
-    static OrderService orderService = new OrderService(supplierService);
+    static SupplierService supplierService = SupplierService.getInstance();
+    static OrderService orderService = OrderService.getInstance();
 
     static Scanner scanner = new Scanner(System.in);
     static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
@@ -34,6 +34,8 @@ public class UI {
                 "9) Set order delivery date",
                 "a) List Suppliers",
                 "b) Add discount to supplier",
+                "c) Load data from DB",
+                "d) Save data to DB",
                 "0) Exit"
 
         };
@@ -78,7 +80,14 @@ public class UI {
                     case 'b':
                         assDiscountToSupplier();
                         break;
+                    case 'c':
+                        loadDataFromDB();
+                        break;
+                    case 'd':
+                        saveDataToDB();
+                        break;
                     case '0':
+                        saveDataToDB();
                         System.out.println("Exiting...");
                         return;
                     default:
@@ -104,6 +113,17 @@ public class UI {
         System.out.println(supplierService.addDiscountToSupplier(supplierName, itemName, itemAmmount, itemprice));
 
     }
+
+    static void loadDataFromDB(){
+        supplierService.loadDataFromDB();
+        orderService.loadDataFromDB();
+    }
+
+    static void saveDataToDB(){
+        supplierService.saveDataToDB();
+        orderService.saveDataToDB();
+    }
+
 
 
     static void createOrder() {

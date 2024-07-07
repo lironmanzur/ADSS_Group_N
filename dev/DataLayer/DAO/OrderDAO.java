@@ -9,42 +9,48 @@ import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
-
 public class OrderDAO {
 
     Connection connection;
-
-    public OrderDAO() {
-        try {
-            connection = DatabaseConnection.getConnection();
-            createTableIfNotExists();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void createTableIfNotExists() {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS Order ("
-                + "id INT AUTO_INCREMENT PRIMARY KEY, "
-                + "name VARCHAR(255) NOT NULL, "
-                + "price DOUBLE NOT NULL"
-                + ")";
-
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(createTableSQL);
-        } catch (SQLException e) {
-            throw new RuntimeException("Error creating table: " + e.getMessage(), e);
-        }
-    }
-
-
     private SupplierDAO supplierDAO;
     private ItemDAO itemDAO;
 
     public OrderDAO(SupplierDAO supplierDAO, ItemDAO itemDAO) {
         this.supplierDAO = supplierDAO;
         this.itemDAO = itemDAO;
+        try {
+            connection = DatabaseConnection.getConnection();
+            createTableIfNotExists();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createTableIfNotExists() {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS orders ("
+                + "order_id INT AUTO_INCREMENT PRIMARY KEY, "
+                + "supplier_id INT NOT NULL, "
+                + "create_date DATE NOT NULL, "
+                + "providing_date DATE NOT NULL, "
+                + "delivered BOOLEAN NOT NULL, "
+                + "total_price_before_discount DOUBLE NOT NULL, "
+                + "total_price_after_discount DOUBLE NOT NULL"
+                + ")";
+
+        String createOrderItemsTableSQL = "CREATE TABLE IF NOT EXISTS order_items ("
+                + "order_item_id INT AUTO_INCREMENT PRIMARY KEY, "
+                + "order_id INT NOT NULL, "
+                + "item_id INT NOT NULL, "
+                + "quantity INT NOT NULL, "
+                + "FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE"
+                + ")";
+
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(createTableSQL);
+            stmt.execute(createOrderItemsTableSQL);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error creating tables: " + e.getMessage(), e);
+        }
     }
 
     // Method to add an Order to the database
@@ -77,7 +83,7 @@ public class OrderDAO {
             pstmt.setLong(1, orderId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    long supplierId = rs.getLong("supplier_id");
+                    int supplierId = rs.getInt("supplier_id");
                     Date createDate = rs.getDate("create_date");
                     Date providingDate = rs.getDate("providing_date");
                     boolean delivered = rs.getBoolean("delivered");

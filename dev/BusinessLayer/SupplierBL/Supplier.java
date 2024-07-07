@@ -25,13 +25,15 @@ public class Supplier {
 
     public void setDiscountNote(DiscountNote discountNote) {
         this.discountNote = discountNote;
+        discountNote.setId(this.id);
     }
 
-    public void createEmptyDiscountNote(){
-        if (discountNote == null) discountNote = new DiscountNote(new HashMap<Item, Map<Integer, Float>>());
+    public void createEmptyDiscountNoteIfNotExists(){
+        if (discountNote == null) discountNote = new DiscountNote(new HashMap<Item, Map<Integer, Float>>(), this.id);
     }
+
     public void addDiscount(Item item, Map<Integer, Float> map){
-        createEmptyDiscountNote();
+        createEmptyDiscountNoteIfNotExists();
         discountNote.getDiscounts().put(item, map);
 
     }

@@ -15,8 +15,8 @@ public class Order {
     private double totalPriceBeforeDiscount;
     private double totalPriceAfterDiscount;
     Supplier supplier;
-    static long idCounter = 965;
-    long id = idCounter++;
+    static int idCounter = 965;
+    int id = idCounter++;
 
 
     public Order(Supplier supplier, Map<Item, Integer> items) {
@@ -176,7 +176,7 @@ public class Order {
         items.put(item, (Integer) i);
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 }

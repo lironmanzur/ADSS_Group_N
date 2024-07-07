@@ -1,8 +1,12 @@
 package dev.Tests;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import dev.BusinessLayer.SupplierBL.*;
 import dev.DataLayer.DAO.ItemDAO;
 import dev.DataLayer.DatabaseConnection;
@@ -53,34 +57,27 @@ public class OrderTest {
         }
     }
     private static boolean testItemDAO(){
+
+        ItemDAO itemDAO = new ItemDAO();
+        Item item = new Item("Apple", 1, 45);
         try {
-            Connection connection = DatabaseConnection.getConnection();
-            ItemDAO itemDAO = new ItemDAO();
-            Item item = new Item("Applqe", 1, 44325);
             itemDAO.addItem(item);
             Item itemFromDB = itemDAO.getItemById(item.getItemId());
-            System.out.println("Item: " + item.getItemName());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            if (item.equals(itemFromDB)) {
+                System.out.println("Test passed: Item saved and retrieved successfully.");
+                return true;
+            } else {
+                System.out.println("Test failed: Item saved and retrieved, but they are not equal.");
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println("Test failed: Exception occurred while saving or retrieving item.");
+//            String stacktrace = Arrays.stream(e.getStackTrace())
+//                                      .map(StackTraceElement::toString)
+//                                      .collect(Collectors.joining("\n"));
+//            System.out.println(stacktrace);
+            return false;
         }
-        return true;
-//        ItemDAO itemDAO = new ItemDAO();
-//        Item item = new Item("Apple", 1, 45);
-//        try {
-//            itemDAO.addItem(item);
-//            Item itemFromDB = itemDAO.getItemById(item.getItemId());
-//            if (item.equals(itemFromDB)) {
-//                System.out.println("Test passed: Item saved and retrieved successfully.");
-//                return true;
-//            } else {
-//                System.out.println("Test failed: Item saved and retrieved, but they are not equal.");
-//                return false;
-//            }
-//        } catch (Exception e) {
-//            System.out.println("Test failed: Exception occurred while saving or retrieving item.");
-//            e.printStackTrace();
-//            return false;
-//        }
     }
 
     // Helper method to create an order with sample items

@@ -3,6 +3,7 @@ public class Contact {
     private String name;
     private String phoneNumber;
     private String Address;
+    private Supplier supplier;
 
     public void setName(String name) {
         this.name = name;
@@ -28,10 +29,18 @@ public class Contact {
         return Address;
     }
 
-    public Contact(String name, String phoneNumber, String address){
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
+    }
+
+    public Contact(String name, String phoneNumber, String address, Supplier supplier){
         this.Address = address;
         this.phoneNumber = phoneNumber;
         this.name = name;
+        this.supplier = supplier;
     }
-
 }

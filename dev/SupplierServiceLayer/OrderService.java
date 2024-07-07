@@ -1,23 +1,33 @@
 package dev.SupplierServiceLayer;
 import dev.BusinessLayer.SupplierBL.*;
+import dev.DataLayer.DAO.OrderDAO;
 
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class OrderService {
+
+    private static OrderService instance = new OrderService(SupplierService.getInstance());
     private Map<Integer, Order> orders;
     private SupplierService supplierService;  // Assume SupplierService is accessible here
     private int currentOrderId;
     static  int itemID = 4537865;
+    private OrderDAO orderDAO;
 
-    public OrderService(SupplierService supplierService) {
+    private OrderService(SupplierService supplierService) {
         this.orders = new HashMap<>();
         this.currentOrderId = 1;
         this.supplierService = supplierService;
+        this.orderDAO = new OrderDAO(supplierService.getSupplierDAO(), supplierService.getItemDAO());
         //assuming the program runs daily
         sendMemos();
+    }
+
+    public static OrderService getInstance() {
+        return instance;
     }
 
     public int getQuantityOfItem(int itemID){
@@ -129,5 +139,30 @@ public class OrderService {
 
     public Order getOrder(int orderId) {
         return orders.get(orderId);
+    }
+
+    public void loadDataFromDB() {
+        try {
+            List<Order> allOrders = orderDAO.getAllOrders();
+            for (Order order : allOrders) {
+                orders.put(order.getId(), order);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load orders from DB: " + e.getMessage(), e);
+        }
+    }
+
+    public void saveDataToDB() {
+        try {
+            for (Order order : orders.values()) {
+                if (order.getId() == 0) { // Assuming getId() returns 0 if not set (newly created)
+                    orderDAO.addOrder(order);
+                } else {
+                    orderDAO.updateOrder(order);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to save orders to DB: " + e.getMessage(), e);
+        }
     }
 }

@@ -9,8 +9,7 @@ import java.util.List;
 
 public class ContactDAO {
     Connection connection;
-
-
+    SupplierDAO supplierDAO;
 
     public ContactDAO() {
         try {
@@ -24,15 +23,16 @@ public class ContactDAO {
 
     private void createTableIfNotExists() {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS contacts ("
-                + "id INT AUTO_INCREMENT PRIMARY KEY, "
                 + "name VARCHAR(255) NOT NULL, "
-                + "price DOUBLE NOT NULL"
+                + "phoneNumber INT AUTO_INCREMENT PRIMARY KEY, "
+                + "Address VARCHAR(255), "
+                + "supplier_id INT"
                 + ")";
 
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSQL);
         } catch (SQLException e) {
-            throw new RuntimeException("Error creating table: " + e.getMessage(), e);
+            e.printStackTrace();
         }
     }
 
@@ -61,7 +61,8 @@ public class ContactDAO {
                     return new Contact(
                             rs.getString("name"),
                             rs.getString("phone_number"),
-                            rs.getString("address")
+                            rs.getString("address"),
+                            DAOFactory.getSupplierDAO().getSupplierById(rs.getInt("supplier_id"))
                     );
                 }
             }
@@ -80,7 +81,8 @@ public class ContactDAO {
                 Contact contact = new Contact(
                         rs.getString("name"),
                         rs.getString("phone_number"),
-                        rs.getString("address")
+                        rs.getString("address"),
+                        DAOFactory.getSupplierDAO().getSupplierById(rs.getInt("supplier_id"))
                 );
                 contacts.add(contact);
             }
@@ -110,20 +112,21 @@ public class ContactDAO {
         }
     }
 
-    public List<Contact> getContactsBySupplierId(long supplierId) {
+    public List<Contact> getContactsBySupplierId(int supplierId) {
 
         //return all contacts by supplier id
         String sql = "SELECT * FROM contacts WHERE supplier_id = ?";
         List<Contact> contacts = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setLong(1, supplierId);
+            pstmt.setInt(1, supplierId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Contact contact = new Contact(
                             rs.getString("name"),
                             rs.getString("phone_number"),
-                            rs.getString("address")
+                            rs.getString("address"),
+                            supplierDAO.getSupplierById(rs.getInt("supplier_id"))
                     );
                     contacts.add(contact);
                 }
@@ -134,29 +137,29 @@ public class ContactDAO {
         return contacts;
     }
 
-    public void addContactForSupplier(long supplierId, Contact contact, Connection conn) {
+    public void addContactForSupplier(int supplierId, Contact contact, Connection conn) {
         //add contact for supplier
         String sql = "INSERT INTO contacts (name, phone_number, address, supplier_id) VALUES (?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, contact.getName());
             pstmt.setString(2, contact.getPhoneNumber());
             pstmt.setString(3, contact.getAddress());
-            pstmt.setLong(4, supplierId);
+            pstmt.setInt(4, supplierId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void updateContactsForSupplier(long supplierId, List<Contact> contacts, Connection conn) {
+    public void updateContactsForSupplier(int supplierId, List<Contact> contacts, Connection conn) {
         //update contacts for supplier
-        String sql = "UPDATE contacts SET phone_number = ?, address = ? WHERE name = ? AND supplier_id = ?";
+        String sql = "UPDATE contacts SET phone_number = ?, address = ? WHERE name = ? AND id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (Contact contact : contacts) {
                 pstmt.setString(1, contact.getPhoneNumber());
                 pstmt.setString(2, contact.getAddress());
                 pstmt.setString(3, contact.getName());
-                pstmt.setLong(4, supplierId);
+                pstmt.setInt(4, supplierId);
                 pstmt.executeUpdate();
             }
         } catch (SQLException e) {
@@ -164,11 +167,11 @@ public class ContactDAO {
         }
     }
 
-    public void deleteContactsBySupplierId(long supplierId, Connection conn) {
+    public void deleteContactsBySupplierId(int supplierId, Connection conn) {
         //delete contacts by supplier id
         String sql = "DELETE FROM contacts WHERE supplier_id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setLong(1, supplierId);
+            pstmt.setInt(1, supplierId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

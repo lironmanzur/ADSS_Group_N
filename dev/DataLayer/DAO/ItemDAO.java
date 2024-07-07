@@ -11,6 +11,7 @@ public class ItemDAO {
 
     Connection connection;
 
+
     public ItemDAO() {
         try {
             connection = DatabaseConnection.getConnection();
@@ -107,7 +108,7 @@ public class ItemDAO {
 
     public List<Item> getItemsBySupplierId(long supplierId) {
         //return all items by supplier id
-        String sql = "SELECT * FROM items WHERE supplier_id = ?";
+        String sql = "SELECT * FROM items WHERE id = ?";
         List<Item> items = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

@@ -1,6 +1,11 @@
 package dev.SupplierServiceLayer;
 import dev.BusinessLayer.SupplierBL.*;
+import dev.DataLayer.DAO.ContactDAO;
+import dev.DataLayer.DAO.DiscountNoteDAO;
+import dev.DataLayer.DAO.ItemDAO;
+import dev.DataLayer.DAO.SupplierDAO;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,11 +13,20 @@ import java.util.List;
 import java.util.Map;
 
 public class SupplierService {
+    static SupplierService instance = new SupplierService();
     private Map<String, Supplier> suppliers;
     static int itemid = 2134256;
+    ItemDAO itemDAO = new ItemDAO();
+    ContactDAO contactDAO = new ContactDAO();
+    DiscountNoteDAO discountNoteDAO = new DiscountNoteDAO();
+    private SupplierDAO supplierDAO = new SupplierDAO(itemDAO, contactDAO, discountNoteDAO);
 
-    public SupplierService() {
+    private SupplierService() {
         this.suppliers = new HashMap<>();
+    }
+
+    public static SupplierService getInstance() {
+        return instance;
     }
 
     public void addSupplier(Supplier supplier) {
@@ -132,9 +146,11 @@ public class SupplierService {
 //        myhasmap.put(item1, myhasmap);
 
 
-        supplier.setDiscountNote(new DiscountNote(new HashMap<>()));
+        //supplier.setDiscountNote(new DiscountNote(new HashMap<>()));
         return "Supplier " + name + " added successfully.";
     }
+
+
 
     public String getSuppliers() {
         StringBuilder suppliers = new StringBuilder();
@@ -148,4 +164,37 @@ public class SupplierService {
         return new ArrayList<>(suppliers.values());
     }
 
+    public void loadDataFromDB() {
+        try {
+            List<Supplier> allSuppliers = supplierDAO.getAllSuppliers();
+            for (Supplier supplier : allSuppliers) {
+                suppliers.put(supplier.getName(), supplier);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to load suppliers from DB: " + e.getMessage(), e);
+        }
+    }
+
+    public void saveDataToDB() {
+        try {
+            for (Supplier supplier : suppliers.values()) {
+
+
+                supplierDAO.addSupplier(supplier);
+
+            }
+        } catch (SQLException e) {
+            System.out.println("SQLException occurred: " + e.getMessage());
+            throw new RuntimeException("Failed to save suppliers to DB: " + e.getMessage(), e);
+        }
+    }
+
+
+    public SupplierDAO getSupplierDAO() {
+        return supplierDAO;
+    }
+
+    public ItemDAO getItemDAO() {
+        return itemDAO;
+    }
 }

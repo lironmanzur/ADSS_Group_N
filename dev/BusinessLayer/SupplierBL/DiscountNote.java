@@ -5,9 +5,11 @@ import java.util.Map;
 public class DiscountNote {
 //    a map of items. for each item thers a map of <ammount, price>
     Map<Item, Map<Integer, Float>> discounts;
+    private int id;
 
-    public DiscountNote(Map<Item, Map<Integer, Float>> discounts) {
+    public DiscountNote(Map<Item, Map<Integer, Float>> discounts, int id) {
         this.discounts = discounts;
+        this.id = id;
     }
 
     public DiscountNote() {
@@ -23,4 +25,11 @@ public class DiscountNote {
     }
 
 
+    public int getSupplierId() {
+        return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }

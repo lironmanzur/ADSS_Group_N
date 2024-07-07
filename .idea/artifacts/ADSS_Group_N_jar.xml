@@ -3,6 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/ADSS_Group_N_jar</output-path>
     <root id="archive" name="ADSS_Group_N.jar">
       <element id="module-output" name="ADSS_Group_N" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/dependencies/mysql-connector-j-9.0.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
